@@ -7,6 +7,9 @@ import {
     NotFoundException,
     Post,
     Body,
+    Put,
+    Query,
+    Delete,
 } from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -37,6 +40,38 @@ export class BlogController {
         return res.status(HttpStatus.OK).json({
             message: 'Post has been submitted successfully!',
             post: newPost,
+        });
+    }
+
+    @Put('/edit')
+    async editPost(
+        @Res() res,
+        @Query('postID', new ValidateObjectId()) postID,
+        @Body() createPostDTO: CreatePostDto,
+    ) {
+        const editedPost = await this.blogService.editPost(postID, createPostDTO);
+
+        if (!editedPost) {
+            throw new NotFoundException('Post does not exist!');
+        }
+
+        return res.status(HttpStatus.OK).json({
+            nessage: 'Post has been submitted successfully!',
+            post: editedPost,
+        });
+    }
+
+    @Delete('/delete')
+    async deletePost(@Res() res, @Query('postID', new ValidateObjectId()) postID) {
+        const deletedPost = await this.blogService.deletePost(postID);
+
+        if (!deletedPost) {
+            throw new NotFoundException('Post does not exist!');
+        }
+
+        return res.status(HttpStatus.OK).json({
+            message: 'Post has been deleted!',
+            post: deletedPost,
         });
     }
 }
